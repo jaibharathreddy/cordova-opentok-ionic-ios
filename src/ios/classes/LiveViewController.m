@@ -609,7 +609,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  
  -(void)afterOverlayTimeAction{
  if (tapped) {
- [UIView animateWithDuration:0.1f
+ [UIView animateWithDuration:0.3f
  animations:^{
        if (self.overlayTimer) {[self.overlayTimer invalidate];}
  [self setHiddenShowForICONs:true];
@@ -621,7 +621,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  }];
  tapped=NO;
  }else{
- [UIView animateWithDuration:0.1f
+ [UIView animateWithDuration:0.3f
  animations:^{
  if (self.overlayTimer) {[self.overlayTimer invalidate];}
  [self setHiddenShowForICONs:false];
