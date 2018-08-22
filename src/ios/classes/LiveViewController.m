@@ -604,7 +604,11 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
 
 /*---View Tapped When Hide Back and BottomView--*/
  - (void)viewTappedInLive:(UITapGestureRecognizer *)tgr {
- [self afterOverlayTimeAction];
+     [self afterOverlayTimeAction];
+     if(!_muteAllActionSheet.hidden){
+         [self.muteAllActionSheet setHidden:YES];
+         muteUnte=true;
+     }
  }//viewTappedInLive
  
  -(void)afterOverlayTimeAction{
