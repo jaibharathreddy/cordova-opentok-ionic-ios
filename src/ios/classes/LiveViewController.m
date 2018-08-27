@@ -209,7 +209,6 @@ UIPanGestureRecognizer * pan1 ;
  switch (permissionStatus) {
  case AVAudioSessionRecordPermissionUndetermined:{
  [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
- // CALL YOUR METHOD HERE - as this assumes being called only once from user interacting with permission alert!
  if (granted) {
  
  }
@@ -251,7 +250,12 @@ UIPanGestureRecognizer * pan1 ;
  [alertController addAction:cancelAction];
  // Provide quick access to Settings.
  UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedString( @"Settings", @"Alert button to open Settings" ) style:UIAlertActionStyleDefault handler:^( UIAlertAction *action ) {
- [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:^(BOOL success) {
+         if (success) {
+             NSLog(@"Opened url");
+         }
+     }];
+
  }];
  [alertController addAction:settingsAction];
  [self presentViewController:alertController animated:YES completion:nil];
@@ -429,7 +433,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
          sub.subscribeToAudio=NO;
      }
      
-     if(_allSubscribers.count<=4){[self shuffle];}else{[self changeView:@"5"];}
+     if(_allSubscribers.count>4 && changeveiw){[self changeView:@"5"];}else{[self shuffle];}
  }//subscriberDidConnectToStream
 
 // Open Tok Delegates
@@ -493,8 +497,8 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
         changeveiw=false;
         [self changeView:@"setToGridView"];
         if(_allSubscribers.count==0){
-        self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(self.swapCameraButton.frame.size.width+10),self.swapCameraButton.frame.origin.y,50,50);
             [self addPublisherview:_publisher];
+        self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(self.swapCameraButton.frame.size.width+10),self.swapCameraButton.frame.origin.y,50,50);
             [self.menuBTNField setHidden:YES];
             [_muteAllActionSheet setHidden:YES];
             [self.participantsListSheet setHidden:YES];
@@ -546,7 +550,6 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  - (void)leavingBackgroundMode:(NSNotification*)notification{
  _publisher.publishVideo = YES;
  _publisher.publishAudio=YES;
- //[self shuffle];
  }//leavingBackgroundMode
 
 /*-------------orientationChanged---------*/
@@ -564,23 +567,11 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
 /*-----------checkSubscribersList--------*/
  -(void)checkSubscribersList{
      if(_allSubscribers.count>0){
-     //allowToSetScrollAxis=true;
-    // if(![_changeViewButton.titleLabel.text isEqualToString:@"grid"]){
-         
-    // }else{
-         allowToSetScrollAxis=true;
+        // allowToSetScrollAxis=true;
+        //[self setUpPublisherFrame:self.mainContainerView.frame.size.height-150 height:80 width:80];
+           //  [self addPublisherview:_publisher];
+        
          [self callRespectiveView];
-
-    // }
-     //allowToSetScrollAxis=true;
-/* if(changeveiw ==false){
- [self setUpPublisherFrame:_scrollView.frame.origin.y height:_scrollView.frame.size.height];
- [self setupScrollView];
- [self addViewMainScrollScontainer:maincontainerSub tagValue:(int)_scrollContainerView.tag];
- [self recyclerView];
- }else{
- [self setUpPublisherFrame:_publisherView.frame.origin.y height:100];
- }*/
      } else{
          [self addPublisherview:_publisher];
      }
@@ -604,8 +595,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  [self setHiddenShowForICONs:true];
  if(keys.count>1){ [self.changeViewButton setHidden:YES];}
  if(changeveiw==false){
- _scrollView.frame=CGRectMake(0,afterIconsOnYaxis, _scrollView.frame.size.width, _scrollView.frame.size.height);
-     [self setUpPublisherFrame:afterIconsOnYaxis height:_scrollView.frame.size.height width:80];
+     [self setupScrollView];
  }
  }];
  tapped=NO;
@@ -617,8 +607,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  [self overlayTimerSetUp];// start overlay hide timer
  if(keys.count>1){  [self.topToolBar setHidden:NO];}
  if(changeveiw==false){
-     _scrollView.frame=CGRectMake(0,initialYaxisScroll,_scrollView.frame.size.width, _scrollView.frame.size.height);
- [self setUpPublisherFrame:initialYaxisScroll height:_scrollView.frame.size.height width:80];
+    [self setupScrollView];
  }
  }];
  tapped=YES;
@@ -655,7 +644,6 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
 /*--showReconnectingAlert--*/
  - (void)showReconnectingAlert{
     [self notificationMessege:@"Session Reconnecting.."];
-    //[self.messegeForUser setHidden:NO];
  }//showReconnectingAlert
  
  /*---dismissReconnectingAlert---*/
@@ -707,9 +695,6 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  float yAxisOfview=0;
  float heightOfView=height;
  
- //NSLog(@" -------height----- %f,%f",height,width);
- //NSLog(@"---------xaxis and yaxis----- %f,%f",xAxisOfview,yAxisOfview );
- 
  for(int i=0;i<_allSubscribers.count;i++){
  OTSubscriber * sub=[_allSubscribers objectForKey:keys[i]];
  if(sub.stream.hasVideo){
@@ -731,6 +716,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
     image.frame = CGRectMake(xAxis, yAxis,width,height);
     image.backgroundColor=[UIColor darkGrayColor];
     image.tag=tag;
+    image.clipsToBounds=YES;
     [_mainContainerView addSubview:image];
 }
 
@@ -749,13 +735,6 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
      //subBtn.frame=CGRectMake(0, sub.view.frame.origin.y-30,30,30);
    [subview addGestureRecognizer:tapTwice];
      [subview addSubview:sub.view];
-  //
-     
- /*UIButton * button=(tag==0)?_audioBTNOne:(tag==1)?_audioBTNTwo:(tag==2)?_audioBTNThree:_audioBTNFour;
- [self addFrameForButtons:width button:button tagValue:tag];
- [self adjustSubscriberAudio:sub.subscribeToAudio subscriber:sub button:button];
- 
- [sub.view addSubview:button];*/
  }//addViewForGridView
 int selectedTappedPersonIndex;
 /*-----tapTwiceOnAnyTraineeInGridView-----*/
@@ -826,7 +805,7 @@ int initialDefaultImgXaxis;
           [self setUpPublisherFrame:_scrollView.frame.origin.y height:_scrollView.frame.size.height width:80];
   }else{
       [self.scrollView setHidden:YES];
-          [self setUpPublisherFrame:400 height:80 width:80];
+          [self setUpPublisherFrame:self.mainContainerView.frame.size.height-180 height:80 width:80];
       [self commonForBothViews:YES imageViewName:@"galaryView" id:sender];
   }
  }//changeView
@@ -847,7 +826,6 @@ int initialDefaultImgXaxis;
 }
 NSMutableArray* btnArrayKey;
 -(void)removeAllSubscribersButtonsFromView{
-    
     for(int i=0;i<=keys.count;i++){
         UIButton * subcriberButton=[_allSubscribersButtons objectForKey:keys[1]];
         [subcriberButton removeFromSuperview];
@@ -866,10 +844,12 @@ NSMutableArray* btnArrayKey;
 bool allowToSetScrollAxis=true;
 /*------setupScrollView----*/
 -(void)setupScrollView{
-    if(allowToSetScrollAxis){
-    initialYaxisScroll=_scrollView.frame.origin.y;
-    afterIconsOnYaxis=_mainContainerView.frame.size.height-100;
-        allowToSetScrollAxis=false;
+    if(_audioSubUnsubButton.hidden&&_videoSubUnsubButton.hidden){
+        _scrollView.frame=CGRectMake(0,_mainContainerView.frame.size.height-80, _scrollView.frame.size.width,_scrollView.frame.size.height);
+        [self setUpPublisherFrame:_scrollView.frame.origin.y height:_scrollView.frame.size.height width:80];
+    }else{
+        _scrollView.frame=CGRectMake(0,_mainContainerView.frame.size.height-160, _scrollView.frame.size.width,_scrollView.frame.size.height);
+         [self setUpPublisherFrame:_scrollView.frame.origin.y height:_scrollView.frame.size.height width:80];
     }
 }//sedtupScrollView
 
@@ -907,6 +887,7 @@ OTSubscriber *maincontainerSubcriber=nil;
         image.frame = CGRectMake(0, 0,self.mainContainerView.frame.size.width, self.mainContainerView.frame.size.height);
         image.backgroundColor=[UIColor darkGrayColor];
         image.contentMode = UIViewContentModeScaleAspectFit;
+         image.clipsToBounds=YES;
         [_mainContainerView addSubview:image];
     }
     
@@ -969,8 +950,8 @@ OTSubscriber *maincontainerSubcriber=nil;
         [_scrollView setContentSize:CGSizeMake(width+100, _scrollView.frame.size.height)];
         _scrollView.delegate=self;
         [self setViewsInScrollView:sub xAxis:xAxis tagValue:i];
-        if(width>350){
-            [_scrollView setContentOffset:CGPointMake(width-310, 0) animated:false];
+        if(width>300){
+            [_scrollView setContentOffset:CGPointMake(width-300, 0) animated:false];
         }
         width+=100;
         xAxis+=90;
@@ -1021,6 +1002,7 @@ UIImageView *mainContainerDefaultImg=nil;
      image.layer.borderWidth = 2;
     image.layer.borderColor=[[UIColor whiteColor] CGColor];
     image.contentMode = UIViewContentModeScaleAspectFit;
+     image.clipsToBounds=YES;
     UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, image.frame.size.width,image.frame.size.height )];
     if(!sub.stream.hasVideo){
         /*UILabel *videoMutelabel=[[UILabel alloc] initWithFrame:CGRectMake(0,0, label.frame.size.width,label.frame.size.height/4)];
@@ -1109,13 +1091,14 @@ UIImageView *mainContainerDefaultImg=nil;
            UIView* subscriberViewInScroll=[_allSubcribersPresentInRecyclerView objectForKey:subscriber.stream.connection.connectionId];
            if(subscriber.stream.connection.connectionId==maincontainerSubcriber.stream.connection.connectionId){
                [self removeSubViewsInMaincontainerViews];
+                 NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
                [self setMainContainerSubscriberView:videoMutedSubscriber tag:(int)subscriberViewInScroll.tag];
            }else{
            for(UIView *subview in _scrollView.subviews){
                if(subscriberViewInScroll.tag==subview.tag){
                    NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
                    [subview removeFromSuperview];
-                   NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
+                 //  NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
                    [self addDefaultImage:videoMutedSubscriber xAxis:subscriberViewInScroll.frame.origin.x widht:subscriberViewInScroll.frame.size.width height:subscriberViewInScroll.frame.size.height
                        tagValue:(int)subscriberViewInScroll.tag];
                }//inner-if
@@ -1140,11 +1123,11 @@ UIImageView *mainContainerDefaultImg=nil;
             UIView* subscriberViewInScroll=[_allSubcribersPresentInRecyclerView objectForKey:subscriber.stream.connection.connectionId];
             if(subscriber.stream.connection.connectionId==maincontainerSubcriber.stream.connection.connectionId){
                 [self removeSubViewsInMaincontainerViews];
+                NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
                 [self setMainContainerSubscriberView:videoMutedSubscriber tag:(int)subscriberViewInScroll.tag];
             }else{
             for(UIImageView *subview in _scrollView.subviews){
                 if(subscriberViewInScroll.tag==subview.tag){
-                    NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
                     [subview removeFromSuperview];
                     NSLog(@"------- checking --- %ldl",(long)subscriberViewInScroll.tag);
                   [self setViewsInScrollView:videoMutedSubscriber xAxis:subscriberViewInScroll.frame.origin.x tagValue:(int)subscriberViewInScroll.tag];
@@ -1185,7 +1168,6 @@ NSTimer * notificationTiemr;
         [self muteAllSubscriberAudio:NO];
         [_muteAllBtnItem setImage:[UIImage imageNamed:@"ic_pause_audio"] forState:UIControlStateNormal];
         [_muteAllBtnItem setTitle:@"     Umute All" forState:UIControlStateNormal];
-        
     }else{
         [self muteAllSubscriberAudio:YES];
           [_muteAllBtnItem setImage:[UIImage imageNamed:@"unmute"] forState:UIControlStateNormal];
@@ -1217,13 +1199,6 @@ bool muteUnte=true;
         [self.muteAllActionSheet setHidden:YES];
         muteUnte=true;
     }
- /*   if(_allSubscribers.count==1){
-        [self.muteAllBtnItem setTitle:@"     Mute" forState:UIControlStateNormal];
-        [self.ParticioantsBtnItem setHidden:YES];
-    }else{
-        [self.muteAllBtnItem setTitle:@"     Mute All" forState:UIControlStateNormal];
-        [self.ParticioantsBtnItem setHidden:NO];
-    }*/
 }//menuBTN
 
 
