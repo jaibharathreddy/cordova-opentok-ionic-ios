@@ -1086,7 +1086,7 @@ UIImageView *mainContainerDefaultImg=nil;
 
 /*------subscriberVideoDisabled------*/
 - (void)subscriberVideoDisabled:(OTSubscriber *)subscriber reason:(OTSubscriberVideoEventReason)reason{
-    if(keys !=nil && _allSubscribers.count>1){
+    if(_allSubscribers.count!=0){
        OTSubscriber *videoMutedSubscriber= [_allSubscribers objectForKey:subscriber.stream.connection.connectionId];
        if(changeveiw){//If changeview is true then we will call gridview functionalities
         SubscriberMesursInGrid *mySubscriber=[_allSubscribersMesures objectForKey:subscriber.stream.connection.connectionId];
@@ -1119,7 +1119,7 @@ UIImageView *mainContainerDefaultImg=nil;
 }//subscriberVideoDisabled
 /*-------subscriberVideoEnabled------*/
 - (void)subscriberVideoEnabled:(OTSubscriberKit *)subscriber reason:(OTSubscriberVideoEventReason)reason {
-    if(keys !=nil&&_allSubscribers.count>1){
+    if(_allSubscribers.count!=0){
        OTSubscriber *videoMutedSubscriber= [_allSubscribers objectForKey:subscriber.stream.connection.connectionId];
        if(changeveiw){
          SubscriberMesursInGrid *mySubscriberViewMesurs=[_allSubscribersMesures objectForKey:subscriber.stream.connection.connectionId];
