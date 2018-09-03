@@ -335,6 +335,7 @@ NSTimer *timer;
  OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
  settings.name =  [self.hybridParams safeObjectForKey:@"userName"];//[UIDevice currentDevice].name;
  _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
+     _publisher.publishVideo=YES;
      [self addPublisherview:_publisher];
      [_messegeForUser setHidden:NO];
  }//setupPublisher
@@ -343,29 +344,38 @@ NSTimer *timer;
 int publisherCounter=0;
 /*----addViewForPublisher-----*/
  -(void)addPublisherview:(OTPublisher *)publisher{
-     
      if(_allSubscribers.count>0){
-      [self.publisherView setHidden:NO];
-      //[self.publisherDeaultImage setHidden:NO];
-      [_publisher.view setFrame:CGRectMake(0, 0, self.publisherView.frame.size.width, self.publisherView.frame.size.height)];
-      [self.publisherView addSubview:_publisher.view];
-      self.publisherView.layer.borderWidth=1;
-        self.publisherView.layer.borderColor=[[UIColor orangeColor] CGColor];
+         [self.publisherView setHidden:NO];
+         [publisher.view setFrame:CGRectMake(0, 0, self.publisherView.frame.size.width, self.publisherView.frame.size.height)];
+         [self.publisherView addSubview:publisher.view];
+         self.publisherView.layer.borderWidth=1;
+         self.publisherView.layer.borderColor=[[UIColor orangeColor] CGColor];
+         if(publisher.publishVideo==YES){
+             [self.publisherDeaultImage setHidden:YES];
+         }else{
+             [self.publisherDeaultImage setHidden:NO];
+         }
      }else{
+         [self.publisherView setHidden:YES];
+         [self.publisherDeaultImage setHidden:YES];
          [NSTimer scheduledTimerWithTimeInterval:0.5f target:self selector:@selector(setPublisherView1) userInfo:nil repeats:NO];
      }
     
  }//addViewForPublisher
 
 -(void)setPublisherView1{
-    [self.publisherView setHidden:YES];
+   // [self.publisherView setHidden:YES];
     [self removeSubViewsInMaincontainerViews];
     if (_publisher.publishVideo){
     [_publisher.view setFrame:CGRectMake(0, 0,_mainContainerView.frame.size.width,_mainContainerView.frame.size.height)];
         [_mainContainerView addSubview:_publisher.view];
     }else{
-        UIImageView*  pDImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,_mainContainerView.frame.size.width, _mainContainerView.frame.size.height)];
-        [pDImage setImage:[UIImage imageNamed:@"avatar"]];
+        UIImageView*  pDImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,150, 150)];
+        [pDImage setImage:[[UIImage imageNamed:@"videoDisabledImageMax"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+        pDImage.contentMode = UIViewContentModeScaleAspectFit;
+        [pDImage setTintColor:[UIColor lightTextColor]];
+        [pDImage setAlpha:0.1];
+        [pDImage setCenter:CGPointMake(CGRectGetMidX(self.mainContainerView.frame),CGRectGetMidY(self.mainContainerView.frame))];
         [_mainContainerView addSubview:pDImage];
     }
 }
@@ -491,24 +501,24 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
      NSString *subscriberJoinedMSG=[subscriber.stream.name stringByAppendingString:@" exit"];
      [self notificationMessege:subscriberJoinedMSG];
      if(_allSubscribers.count<=1){
-        if(changeveiw){
-        _scrollView.frame=CGRectMake(0,initialYaxisScroll,_scrollView.frame.size.width, _scrollView.frame.size.height);[self.changeViewButton setHidden:YES];
-        }//if
+      //  if(changeveiw){
+    //_scrollView.frame=CGRectMake(0,initialYaxisScroll,_scrollView.frame.size.width, _scrollView.frame.size.height);
+            [self.changeViewButton setHidden:YES];
+       // }//if
         changeveiw=false;
         [self changeView:@"setToGridView"];
-        if(_allSubscribers.count==0){
-            [self addPublisherview:_publisher];
-        self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(self.swapCameraButton.frame.size.width+10),self.swapCameraButton.frame.origin.y,50,50);
-            [self.menuBTNField setHidden:YES];
-            [_muteAllActionSheet setHidden:YES];
-            [self.participantsListSheet setHidden:YES];
-            [notificationTiemr invalidate];
-            self.messegeForUser.text=@"Waiting for user to join..";
-            [notificationTiemr invalidate];
-         }// inner If
-      }else{
-          [self callRespectiveView];
-     }//if-else
+          if(_allSubscribers.count==0){
+              [self addPublisherview:_publisher];
+              self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(self.swapCameraButton.frame.size.width+10),self.swapCameraButton.frame.origin.y,50,50);
+              [self.menuBTNField setHidden:YES];
+              [_muteAllActionSheet setHidden:YES];
+              [self.participantsListSheet setHidden:YES];
+              [notificationTiemr invalidate];
+              self.messegeForUser.text=@"Waiting for user to join..";
+             // [notificationTiemr invalidate];
+          }
+     }else{
+         [self callRespectiveView];}//if-else
      if(!_participantsListSheet.hidden){
          //[self removeLabelsFromParticipantsSheet];
        [self setSubscribersButtonsInParticipantsSheet];
