@@ -353,7 +353,7 @@ int publisherCounter=0;
          if(publisher.publishVideo==YES){
              [self.publisherDeaultImage setHidden:YES];
          }else{
-             [self.publisherDeaultImage setHidden:NO];
+              [self setPublisherDefaultImageViewIcon];
          }
      }else{
          [self.publisherView setHidden:YES];
@@ -364,17 +364,12 @@ int publisherCounter=0;
  }//addViewForPublisher
 
 -(void)setPublisherView1{
-   // [self.publisherView setHidden:YES];
     [self removeSubViewsInMaincontainerViews];
     if (_publisher.publishVideo){
     [_publisher.view setFrame:CGRectMake(0, 0,_mainContainerView.frame.size.width,_mainContainerView.frame.size.height)];
         [_mainContainerView addSubview:_publisher.view];
     }else{
-        UIImageView*  pDImage=[[UIImageView alloc] initWithFrame:CGRectMake(0,0,150, 150)];
-        [pDImage setImage:[[UIImage imageNamed:@"videoDisabledImageMax"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
-        pDImage.contentMode = UIViewContentModeScaleAspectFit;
-        [pDImage setTintColor:[UIColor lightTextColor]];
-        [pDImage setAlpha:0.1];
+        UIImageView*  pDImage=[self setUIImageviews:0 yAxis:0 width:100 hight:100 tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.2];
         [pDImage setCenter:CGPointMake(CGRectGetMidX(self.mainContainerView.frame),CGRectGetMidY(self.mainContainerView.frame))];
         [_mainContainerView addSubview:pDImage];
     }
@@ -427,16 +422,9 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  }
  [_allStreams setObject:sub.stream forKey:sub.stream.connection.connectionId];
  if(keys.count>1){[self.changeViewButton setHidden:NO];}
- /*if([_muteUnmuteAllButton.titleLabel.text isEqualToString:@"Unmute all"]){
- [self enableAndDisableAllSu
-  bscriberAudios:false];
- }else{
- [self enableAndDisableAllSubscriberAudios:true];
- }*/
      NSString *subscriberJoinedMSG=[sub.stream.name stringByAppendingString:@" joined"];
      [self notificationMessege:subscriberJoinedMSG];
      if(!_participantsListSheet.hidden){
-        // [self removeLabelsFromParticipantsSheet];
          [self setSubscribersButtonsInParticipantsSheet];
      }
      if(![_muteAllBtnItem.titleLabel.text isEqualToString:@"     Mute All"]){
@@ -501,10 +489,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
      NSString *subscriberJoinedMSG=[subscriber.stream.name stringByAppendingString:@" exit"];
      [self notificationMessege:subscriberJoinedMSG];
      if(_allSubscribers.count<=1){
-      //  if(changeveiw){
-    //_scrollView.frame=CGRectMake(0,initialYaxisScroll,_scrollView.frame.size.width, _scrollView.frame.size.height);
             [self.changeViewButton setHidden:YES];
-       // }//if
         changeveiw=false;
         [self changeView:@"setToGridView"];
           if(_allSubscribers.count==0){
@@ -515,12 +500,10 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
               [self.participantsListSheet setHidden:YES];
               [notificationTiemr invalidate];
               self.messegeForUser.text=@"Waiting for user to join..";
-             // [notificationTiemr invalidate];
           }
      }else{
          [self callRespectiveView];}//if-else
      if(!_participantsListSheet.hidden){
-         //[self removeLabelsFromParticipantsSheet];
        [self setSubscribersButtonsInParticipantsSheet];
      }//if
     }//streamDestroyed
@@ -577,10 +560,6 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
 /*-----------checkSubscribersList--------*/
  -(void)checkSubscribersList{
      if(_allSubscribers.count>0){
-        // allowToSetScrollAxis=true;
-        //[self setUpPublisherFrame:self.mainContainerView.frame.size.height-150 height:80 width:80];
-           //  [self addPublisherview:_publisher];
-        
          [self callRespectiveView];
      } else{
          [self addPublisherview:_publisher];
@@ -721,12 +700,8 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
 
 -(void)addDefaultImageForViewInGrid:(OTSubscriber *)sub width:(float )width height:(float )height xAxis:(float )xAxis yAxis:(float )yAxis tagValue:(int )tag{
     [self setSubscribersMesures:sub.stream.connection.connectionId xAxis:xAxis yAxis:yAxis width:width height:height tag:tag];
-    UIImageView *image=[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"avatar"]];
-    image.contentMode = UIViewContentModeScaleAspectFit;
-    image.frame = CGRectMake(xAxis, yAxis,width,height);
-    image.backgroundColor=[UIColor darkGrayColor];
-    image.tag=tag;
-    image.clipsToBounds=YES;
+    UIImageView *image=[self setUIImageviews:(xAxis+(width/2)-50) yAxis:(yAxis+(height/2)-50) width:100 hight:100 tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.2];
+     image.tag=tag;
     [_mainContainerView addSubview:image];
 }
 
@@ -740,9 +715,6 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
      subview.tag=tag;
      UITapGestureRecognizer * tapTwice=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTwiceOnAnyTraineeInGridView:)];
      tapTwice.numberOfTapsRequired=2;
-     //subAudioBtn.frame=CGRectMake(, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>);
-    // UIButton * subBtn=[_allSubscribersButtons objectForKey:sub.stream.connection.connectionId];
-     //subBtn.frame=CGRectMake(0, sub.view.frame.origin.y-30,30,30);
    [subview addGestureRecognizer:tapTwice];
      [subview addSubview:sub.view];
  }//addViewForGridView
@@ -783,7 +755,7 @@ int selectedTappedPersonIndex;
     
      [self.videoSubUnsubButton setImage:[UIImage imageNamed:@"ic_pause_video"] forState:UIControlStateNormal];
       if(_allSubscribers.count!=0){
-          [self.publisherDeaultImage setHidden:NO];
+          [self setPublisherDefaultImageViewIcon];
       }else{
           [self setPublisherView1];
       }
@@ -822,7 +794,6 @@ int initialDefaultImgXaxis;
 
 -(void)commonForBothViews:(Boolean )booleanValue imageViewName:(NSString *)imgName id:(NSString *)id{
     changeveiw=booleanValue;
- //   [self removeAllSubscribersButtonsFromView];
     [self setHiddenAudioButtons:true];
     [self removeSubViewsInMaincontainerViews];
     [self removeViewsFromRecycler];
@@ -877,8 +848,6 @@ bool allowToSetScrollAxis=true;
         
     }else{
         [self addPublisherview:_publisher];
-        //[self removeSubViewsInMaincontainerViews];
-        //[self hideAudioButtons:YES];
         [self reCyclerView];
     }
 }//shuffle
@@ -890,15 +859,18 @@ OTSubscriber *maincontainerSubcriber=nil;
      self.mainContainerView.tag=tagNO;
     if(mainViewSubscriber.stream.hasVideo){  //based on user video we are setting view
         [mainViewSubscriber.view setFrame:CGRectMake(0, 0, self.mainContainerView.frame.size.width, self.mainContainerView.frame.size.height)];
-        //[mainViewSubscriber.view addSubview:mainConAudioButton];
         [self.mainContainerView addSubview:mainViewSubscriber.view];
     }else{
-        UIImageView *image=[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"avatar"]];
-        image.frame = CGRectMake(0, 0,self.mainContainerView.frame.size.width, self.mainContainerView.frame.size.height);
-        image.backgroundColor=[UIColor darkGrayColor];
-        image.contentMode = UIViewContentModeScaleAspectFit;
+        UIView * defaultImg=[[UIView alloc] initWithFrame:CGRectMake(0, 0,self.mainContainerView.frame.size.width,self.mainContainerView.frame.size.height)];
+        UIImageView *image=[self setUIImageviews:0 yAxis:0 width:100 hight:100 tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.2];
          image.clipsToBounds=YES;
-        [_mainContainerView addSubview:image];
+        [image setCenter:CGPointMake(CGRectGetMidX(self.mainContainerView.frame),CGRectGetMidY(self.mainContainerView.frame)-30)];
+         [defaultImg addSubview:image];
+        UILabel *maincontrinerLable=[self setLabel:0 yAxis:image.frame.origin.y+100 width:self.mainContainerView.frame.size.width hight:30 textColor:[UIColor lightTextColor]];
+        maincontrinerLable.text=[mainViewSubscriber.stream.name stringByAppendingString:@" video disabled"];
+        maincontrinerLable.textAlignment=NSTextAlignmentCenter;
+        [defaultImg addSubview:maincontrinerLable];
+        [_mainContainerView addSubview:defaultImg];
     }
     
 }
@@ -1006,22 +978,12 @@ UIImageView *mainContainerDefaultImg=nil;
                 height:(double )height
               tagValue:(int )tag
 {
-    NSString * imageName=([sub.stream.connection.connectionId isEqual:maincontainerSubcriber.stream.connection.connectionId])? @"bgThaminailView" :@"avatar";
-    UIImageView *image=[[UIImageView alloc] initWithImage:[UIImage imageNamed:imageName]];
-    image.frame = CGRectMake(xAxis, 0,width,height);
+    UIImageView *image=[[UIImageView alloc] initWithFrame:CGRectMake(xAxis, 0,width,height)];
      image.layer.borderWidth = 2;
     image.layer.borderColor=[[UIColor whiteColor] CGColor];
     image.contentMode = UIViewContentModeScaleAspectFit;
      image.clipsToBounds=YES;
-    UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, image.frame.size.width,image.frame.size.height )];
-    if(!sub.stream.hasVideo){
-        /*UILabel *videoMutelabel=[[UILabel alloc] initWithFrame:CGRectMake(0,0, label.frame.size.width,label.frame.size.height/4)];
-        videoMutelabel.textColor=[UIColor redColor];
-        videoMutelabel.textAlignment = NSTextAlignmentCenter;
-        videoMutelabel.text=([container isEqualToString:@"main"])? @"Video muted" :@"Muted";
-        [label addSubview:videoMutelabel];*/
-    }
-    label.textColor=[UIColor whiteColor];
+    UILabel *label=[self setLabel:0 yAxis:0 width:image.frame.size.width hight:image.frame.size.height  textColor:[UIColor whiteColor]];
     label.textAlignment = NSTextAlignmentCenter;
     label.text=sub.stream.name;
     [image addSubview:label];
@@ -1031,13 +993,19 @@ UIImageView *mainContainerDefaultImg=nil;
     image.userInteractionEnabled=YES;
         [image addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapOnScrollerViews:)]];
       UIButton *defaultImgBtn=[self setAudioButtonsInRecyclerView:image.frame.size.width-30 yAxis:image.frame.size.height-30 width:30 height:30  tag:tag];
-      [image addSubview:defaultImgBtn];
+    [image addSubview:defaultImgBtn];
     if([maincontainerSubcriber.stream.connection.connectionId isEqual:sub.stream.connection.connectionId]){
         defaultImgInitialInScrollTag=tag;
         mainContainerDefaultImg=image;
+          [image setBackgroundColor: [UIColor colorWithRed:64/255.0f green:180/255.0f blue:202/255.0f alpha:1.0f]];
+    }else{
+        image.backgroundColor=[UIColor darkGrayColor];
+        UIImageView *miniDef=[self setUIImageviews:5 yAxis:3 width:20 hight:20 tintColor:[UIColor lightTextColor] imageName:@"defaultImgMini" setAlpha:1];
+        [image addSubview:miniDef];
     }
      [_allSubscribersButtons setObject:defaultImgBtn forKey:sub.stream.connection.connectionId];
      [_scrollView addSubview:image];
+    
      [_allSubcribersPresentInRecyclerView setObject:image forKey:sub.stream.connection.connectionId];
 }//addDefaultImage
 //float maincontainerIndex=0;
@@ -1086,6 +1054,8 @@ UIImageView *mainContainerDefaultImg=nil;
 
 /*------subscriberVideoDisabled------*/
 - (void)subscriberVideoDisabled:(OTSubscriber *)subscriber reason:(OTSubscriberVideoEventReason)reason{
+    NSString *subscriberJoinedMSG=[subscriber.stream.name stringByAppendingString:@" video disabled"];
+    [self notificationMessege:subscriberJoinedMSG];
     if(_allSubscribers.count!=0){
        OTSubscriber *videoMutedSubscriber= [_allSubscribers objectForKey:subscriber.stream.connection.connectionId];
        if(changeveiw){//If changeview is true then we will call gridview functionalities
@@ -1119,6 +1089,8 @@ UIImageView *mainContainerDefaultImg=nil;
 }//subscriberVideoDisabled
 /*-------subscriberVideoEnabled------*/
 - (void)subscriberVideoEnabled:(OTSubscriberKit *)subscriber reason:(OTSubscriberVideoEventReason)reason {
+    NSString *subscriberJoinedMSG=[subscriber.stream.name stringByAppendingString:@" video enabled"];
+    [self notificationMessege:subscriberJoinedMSG];
     if(_allSubscribers.count!=0){
        OTSubscriber *videoMutedSubscriber= [_allSubscribers objectForKey:subscriber.stream.connection.connectionId];
        if(changeveiw){
@@ -1229,10 +1201,8 @@ bool muteUnte=true;
     for (int i=0; i<_allSubscribers.count; i++) {
         OTSubscriber * participant=[_allSubscribers objectForKey:keys[i]];
       UIView *viewsInParticipants=[[UIView alloc] initWithFrame:CGRectMake(0,yAxis, _participantsListSheet.frame.size.width,60)];
-        UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(0,5, _participantsListSheet.frame.size.width,50)];
-        label.userInteractionEnabled=YES;
+        UILabel *label=[self setLabel:0 yAxis:5 width:_participantsListSheet.frame.size.width hight:50 textColor:[UIColor lightGrayColor]];
         label.text=[@"  " stringByAppendingString:participant.stream.name];
-        label.textColor=[UIColor lightGrayColor];
         UIButton* particioantAudioBTN=[self setAudioButtonsInRecyclerView:(viewsInParticipants.frame.size.width-50) yAxis:10 width:40 height:40 tag:i];
             viewsInParticipants.tag=i;
             viewsInParticipants.layer.borderWidth=0.5;
@@ -1256,10 +1226,8 @@ bool muteUnte=true;
 /*------setParticipantsHeader---*/
 -(void)setParticipantsHeader{
     UIView * participantsHeaderView=[[UIView alloc] initWithFrame:CGRectMake(0, 0,self.participantsListSheet.frame.size.width,50)];
-    UILabel* participantsHeader=[[UILabel alloc] initWithFrame:CGRectMake(0, 0,participantsHeaderView.frame.size.width, 80)];
-    participantsHeader.userInteractionEnabled=YES;
-    participantsHeader.text=@"             Participants";
-    participantsHeader.textColor=[UIColor whiteColor];
+    UILabel* participantsHeader=[self setLabel:0 yAxis:0 width:participantsHeaderView.frame.size.width hight:80 textColor:[UIColor whiteColor]];
+     participantsHeader.text=@"             Participants";
     [participantsHeader setBackgroundColor: [UIColor colorWithRed:64/255.0f green:180/255.0f blue:202/255.0f alpha:1.0f]];
     UIButton * headerBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 20, 40, 40)];
     [headerBtn setImage:[UIImage imageNamed:@"backButton"] forState:UIControlStateNormal];
@@ -1292,7 +1260,32 @@ bool muteUnte=true;
  name:UIApplicationDidBecomeActiveNotification
  object:nil];
  }//dealloc
+/*-------setLabel-----*/
+-(UILabel *)setLabel:(float)xAxis yAxis:(float)yAxis width:(float)width hight:(float)height textColor:(UIColor*)textColor{
+    UILabel *label=[[UILabel alloc] initWithFrame:CGRectMake(xAxis,yAxis,width,height)];
+    label.userInteractionEnabled=YES;
+    label.textColor=textColor;
+    return label;
+}//setLabel
 
+/*---------setUIImageviews------*/
+-(UIImageView *)setUIImageviews:(float)xAxis yAxis:(float)yAxis width:(float)width hight:(float)height tintColor:(UIColor*)tintColor imageName:(NSString *)name setAlpha:(float) alpha{
+    UIImageView*  image=[[UIImageView alloc] initWithFrame:CGRectMake(xAxis,yAxis,width,height)];
+    [image setImage:[[UIImage imageNamed:name] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    image.contentMode = UIViewContentModeScaleAspectFit;
+    [image setTintColor:tintColor];
+    [image setAlpha:alpha];
+    return image;
+}//setUIImageviews
+/*----setPublisherDefaultImage----*/
+-(void)setPublisherDefaultImageViewIcon{
+    [self.publisherDeaultImage setHidden:NO];
+    self.publisherDeaultImage.layer.borderWidth=1;
+    self.publisherDeaultImage.layer.borderColor=[[UIColor orangeColor] CGColor];
+   // self.publisherDeaultImage.backgroundColor=[UIColor blackColor];
+    UIImageView *miniDef=[self setUIImageviews:5 yAxis:3 width:20 hight:20 tintColor:[UIColor lightTextColor] imageName:@"defaultImgMini" setAlpha:0.5];
+    [self.publisherDeaultImage addSubview:miniDef];
+}
 
 /*------connection created ---------*/
 - (void)  session:(OTSession *)session
