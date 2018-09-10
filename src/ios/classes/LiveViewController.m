@@ -543,6 +543,7 @@ self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(
  - (void)leavingBackgroundMode:(NSNotification*)notification{
  _publisher.publishVideo = YES;
  _publisher.publishAudio=YES;
+     [self addPublisherview:_publisher];
  }//leavingBackgroundMode
 
 /*-------------orientationChanged---------*/
