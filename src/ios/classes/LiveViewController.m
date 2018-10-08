@@ -15,7 +15,7 @@ static NSString *const kApiKey = @"46033242";
 // Replace with your generated session ID
 static NSString *const kSessionId = @"2_MX40NjAzMzI0Mn5-MTUxNTE1OTI1MTgxNX41TVVVWjBaVXRIRHNqZGJUaWoxY0ZjNDB-fg";
 // Replace with your generated token
-static NSString *const kToken = @"T1==cGFydG5lcl9pZD00NjAzMzI0MiZzaWc9N2VmNmYzNTViMTEyNzFjN2E0YTc0ZGI2YzIyOTE4OWZhMjRmYjc1NjpzZXNzaW9uX2lkPTJfTVg0ME5qQXpNekkwTW41LU1UVXhOVEUxT1RJMU1UZ3hOWDQxVFZWVldqQmFWWFJJUkhOcVpHSlVhV294WTBaak5EQi1mZyZjcmVhdGVfdGltZT0xNTE1MjQwODIyJm5vbmNlPTAuMTQzNzU0NTY3OTYyODc1MzMmcm9sZT1tb2RlcmF0b3ImZXhwaXJlX3RpbWU9MTUxNzgzMjgyMSZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==";
+static NSString *const kToken = @"T1==cGFydG5lcl9pZD00NjAzMzI0MiZzaWc9N2VmNmYzNTViMTEyNzFjN2E0YTc0ZGI2YzIyOTE4OWZhMjRmYjc1NjpzZXNzaW9uX2lkPTJfTVg0ME5qQXpNekkwTW41LU1UVXhOVEUxTRJMU1UZ3hOWDQxVFZWVldqQmFWWFJJUkhOcVpHSlVhV294WTBaak5EQi1mZyZjcmVhdGVfdGltZT0xNTE1MjQwODIyJm5vbmNlPTAuMTQzNzU0NTY3OTYyODc1MzMmcm9sZT1tb2RlcmF0b3ImZXhwaXJlX3RpbWU9MTUxNzgzMjgyMSZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==";
 
 @interface LiveViewController ()<OTSessionDelegate, OTSubscriberKitDelegate,
 OTPublisherDelegate,UIGestureRecognizerDelegate,UIScrollViewDelegate>
@@ -700,9 +700,20 @@ int publisherCounter=0;
 
 -(void)addDefaultImageForViewInGrid:(OTSubscriber *)sub width:(float )width height:(float )height xAxis:(float )xAxis yAxis:(float )yAxis tagValue:(int )tag{
     [self setSubscribersMesures:sub.stream.connection.connectionId xAxis:xAxis yAxis:yAxis width:width height:height tag:tag];
-    UIImageView *image=[self setUIImageviews:(xAxis+(width/2)-50) yAxis:(yAxis+(height/2)-50) width:100 hight:100 tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.2];
-    image.tag=tag;
-    [_mainContainerView addSubview:image];
+    UIImageView *defaultImg=[self setUIImageviews:xAxis yAxis:yAxis width:width hight:height tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.4];
+    defaultImg.tag=tag;
+    [defaultImg setUserInteractionEnabled:YES];
+    UITapGestureRecognizer * tapTwice=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTwiceOnAnyTraineeInGridView:)];
+    tapTwice.numberOfTapsRequired=2;
+    [defaultImg setContentMode:UIViewContentModeCenter];
+    [defaultImg addGestureRecognizer:tapTwice];
+    NSString *username=sub.stream.name;
+    UILabel * userlabel=[[UILabel alloc] initWithFrame:CGRectMake(((defaultImg.frame.size.width/2)-(username.length/2+25)),(defaultImg.frame.size.height/2)+35,(username.length+50), 15)];
+    userlabel.text=username;
+    userlabel.textAlignment=NSTextAlignmentCenter;
+    [userlabel setTextColor:[UIColor lightTextColor]];
+    [defaultImg addSubview:userlabel];
+    [_mainContainerView addSubview:defaultImg];
 }
 
 
