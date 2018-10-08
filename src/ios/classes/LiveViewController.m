@@ -375,13 +375,15 @@ int publisherCounter=0;
     }
 }
 
+bool appInBackGroundAudio;
 /*----- Handling Background and foreground ----*/
 - (void)enteringBackgroundMode:(NSNotification*)notification{
     if (self.overlayTimer) {[self.overlayTimer invalidate];}
-    //_publisher.publishVideo = NO;
-    //_publisher.publishAudio=NO;
+    if(_publisher.publishAudio){
+        _publisher.publishAudio=NO;
+        appInBackGroundAudio=YES;
+    }
 }
-
 
 /*----------------publisher didFailWithError------------*/
 - (void)publisher:(OTPublisher *)publisher didFailWithError:(OTError *)error
@@ -494,12 +496,13 @@ int publisherCounter=0;
         changeveiw=false;
         [self changeView:@"setToGridView"];
         if(_allSubscribers.count==0){
+            [self stopNotification];
             [self addPublisherview:_publisher];
             self.swapCameraButton.frame=CGRectMake(self.mainContainerView.frame.size.width-(self.swapCameraButton.frame.size.width+10),self.swapCameraButton.frame.origin.y,50,50);
             [self.menuBTNField setHidden:YES];
             [_muteAllActionSheet setHidden:YES];
             [self.participantsListSheet setHidden:YES];
-            [notificationTiemr invalidate];
+            [self.messegeForUser setHidden:NO];
             self.messegeForUser.text=@"Waiting for user to join..";
         }
     }else{
@@ -542,6 +545,7 @@ int publisherCounter=0;
 
 /*------leavingBackgroundMode-----*/
 - (void)leavingBackgroundMode:(NSNotification*)notification{
+    _publisher.publishAudio=(appInBackGroundAudio)?YES:_publisher.publishAudio;
     [self addPublisherview:_publisher];
 }//leavingBackgroundMode
 
@@ -1132,7 +1136,7 @@ UIImageView *mainContainerDefaultImg=nil;
 }//subscriberVideoEnabled
 NSTimer * notificationTiemr;
 -(void)notificationMessege:(NSString *)messege{
-    notificationTiemr=[NSTimer scheduledTimerWithTimeInterval: 5.0f target:self selector:@selector(stopNotification) userInfo:nil repeats: NO];
+    notificationTiemr=[NSTimer scheduledTimerWithTimeInterval: 3.0f target:self selector:@selector(stopNotification) userInfo:nil repeats: NO];
     [notificationTiemr isValid];
     [self.messegeForUser setHidden:NO];
     self.messegeForUser.text=messege;
