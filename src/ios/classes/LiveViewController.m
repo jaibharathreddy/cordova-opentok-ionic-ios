@@ -369,8 +369,8 @@ int publisherCounter=0;
         [_publisher.view setFrame:CGRectMake(0, 0,_mainContainerView.frame.size.width,_mainContainerView.frame.size.height)];
         [_mainContainerView addSubview:_publisher.view];
     }else{
-        UIImageView*  pDImage=[self setUIImageviews:0 yAxis:0 width:100 hight:100 tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.2];
-        [pDImage setCenter:CGPointMake(CGRectGetMidX(self.mainContainerView.frame),CGRectGetMidY(self.mainContainerView.frame))];
+        UIImageView*  pDImage=[self setUIImageviews:0 yAxis:0 width:_mainContainerView.frame.size.width hight:_mainContainerView.frame.size.height tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.3];
+        [pDImage setContentMode:UIViewContentModeCenter];
         [_mainContainerView addSubview:pDImage];
     }
 }
@@ -713,7 +713,7 @@ bool appInBackGroundAudio;
     [defaultImg setContentMode:UIViewContentModeCenter];
     [defaultImg addGestureRecognizer:tapTwice];
     NSString *username=sub.stream.name;
-    UILabel * userlabel=[[UILabel alloc] initWithFrame:CGRectMake(((defaultImg.frame.size.width/2)-(username.length/2+25)),(defaultImg.frame.size.height/2)+35,(username.length+50), 15)];
+    UILabel * userlabel=[[UILabel alloc] initWithFrame:CGRectMake(((defaultImg.frame.size.width/2)-((username.length/2)+40)),(defaultImg.frame.size.height/2)+35,(username.length+80), 15)];
     userlabel.text=username;
     userlabel.textAlignment=NSTextAlignmentCenter;
     [userlabel setTextColor:[UIColor lightTextColor]];
@@ -878,14 +878,15 @@ OTSubscriber *maincontainerSubcriber=nil;
         [self.mainContainerView addSubview:mainViewSubscriber.view];
     }else{
         UIView * defaultImg=[[UIView alloc] initWithFrame:CGRectMake(0, 0,self.mainContainerView.frame.size.width,self.mainContainerView.frame.size.height)];
-        UIImageView *image=[self setUIImageviews:0 yAxis:0 width:100 hight:100 tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.2];
+        UIImageView *image=[self setUIImageviews:0 yAxis:0 width:self.mainContainerView.frame.size.width hight:self.mainContainerView.frame.size.height tintColor:[UIColor lightTextColor] imageName:@"videoDisabledImageMax" setAlpha:0.3];
         image.clipsToBounds=YES;
-        [image setCenter:CGPointMake(CGRectGetMidX(self.mainContainerView.frame),CGRectGetMidY(self.mainContainerView.frame)-30)];
+        [image setContentMode:UIViewContentModeCenter];
+        //[image setCenter:CGPointMake(CGRectGetMidX(self.mainContainerView.frame),CGRectGetMidY(self.mainContainerView.frame)-30)];
         [defaultImg addSubview:image];
-        UILabel *maincontrinerLable=[self setLabel:0 yAxis:image.frame.origin.y+100 width:self.mainContainerView.frame.size.width hight:30 textColor:[UIColor lightTextColor]];
-        maincontrinerLable.text=[mainViewSubscriber.stream.name stringByAppendingString:@" video disabled"];
+        UILabel *maincontrinerLable=[self setLabel:(image.frame.size.width/2)-((mainViewSubscriber.stream.name.length/2)+40) yAxis:(image.frame.size.height/2)+35 width:(mainViewSubscriber.stream.name.length+80) hight:15 textColor:[UIColor lightTextColor]];//mainViewSubscriber.stream.name
+        maincontrinerLable.text=mainViewSubscriber.stream.name;
         maincontrinerLable.textAlignment=NSTextAlignmentCenter;
-        [defaultImg addSubview:maincontrinerLable];
+        [image addSubview:maincontrinerLable];
         [_mainContainerView addSubview:defaultImg];
     }
     
@@ -1043,6 +1044,7 @@ UIImageView *mainContainerDefaultImg=nil;
         [tappedSubAudioBtn removeFromSuperview];
         [_allSubscribersButtons removeObjectForKey:tappedSub.stream.connection.connectionId];
         maincontainerSubcriber=nil;
+        [self removeViewsFromMaincontainer];
         [self setMainContainerSubscriberView:tappedSub tag:index];
         UIView *tappedView=pan.view;
         for(UIView *subview in _scrollView.subviews){
@@ -1056,6 +1058,12 @@ UIImageView *mainContainerDefaultImg=nil;
     }
 }//tapOnScrollerViews
 
+/*-----removeViewsFromMaincontainer----*/
+-(void)removeViewsFromMaincontainer{
+    for (UIView *subview in _mainContainerView.subviews) {
+        [subview removeFromSuperview];
+    }
+}//removeViewsFromMaincontainer
 
 /*-------------removeViewsFromRecycler--------*/
 -(void)removeViewsFromRecycler{
