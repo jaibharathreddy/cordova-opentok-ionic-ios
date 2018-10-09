@@ -484,6 +484,7 @@ bool appInBackGroundAudio;
 - (void)session:(OTSession *)session streamDestroyed:(OTStream *)stream{
     NSLog(@"streamDestroyed %@", stream.connection.connectionId);
     OTSubscriber *subscriber = [_allSubscribers objectForKey:stream.connection.connectionId];
+    maincontainerSubcriber=([maincontainerSubcriber.stream.connection.connectionId isEqual:subscriber.stream.connection.connectionId])?nil:maincontainerSubcriber;
     [keys removeObject:stream.connection.connectionId];
     [subscriber.view removeFromSuperview];
     [_allSubscribers removeObjectForKey:stream.connection.connectionId];
@@ -814,8 +815,8 @@ int initialDefaultImgXaxis;
     [self removeViewsFromRecycler];
     [_changeViewButton setImage:[UIImage imageNamed:imgName] forState:UIControlStateNormal];
     if(!changeveiw){
-        int tag=([id isEqual:@"double"])? selectedTappedPersonIndex:0;
-        OTSubscriber *sub=[_allSubscribers objectForKey:keys[tag]];
+        int tag=([id isEqual:@"double"])? selectedTappedPersonIndex:0;//maincontainerSubcriber
+        OTSubscriber *sub=maincontainerSubcriber==nil?[_allSubscribers objectForKey:keys[tag]]:maincontainerSubcriber;
         [self setMainContainerSubscriberView:sub tag:tag];
     }
     [self shuffle];
@@ -890,9 +891,14 @@ OTSubscriber *maincontainerSubcriber=nil;
     
 }
 
--(UIButton *) setAudioButtonsInRecyclerView:(double )xAxis yAxis:(double )yAxis width:(double )width height:(double )height tag:(int )tagNo {
+-(UIButton *) setAudioButtonsInRecyclerView:(double )xAxis yAxis:(double )yAxis width:(double )width height:(double )height tag:(int )tagNo callingFrom:(NSString *)callingFrom {
+    UIButton *button=nil;
     OTSubscriber *subAudio=[_allSubscribers objectForKey:keys[tagNo]];
-    UIButton *button=(tagNo==0)? _audioBTNOne:(tagNo==1)?_audioBTNTwo:(tagNo==2)?_audioBTNThree:(tagNo==3)?_audioBTNFour:_audioBTNFive;
+    if([callingFrom isEqualToString:@"ParticipantsSheet"]){
+        button=[[UIButton alloc] init];
+    }else{
+        button=(tagNo==0)? _audioBTNOne:(tagNo==1)?_audioBTNTwo:(tagNo==2)?_audioBTNThree:(tagNo==3)?_audioBTNFour:_audioBTNFive;
+    }
     [button setHidden:NO];
     button.frame=CGRectMake(xAxis, yAxis, width, height);
     NSString* imageType=(subAudio.subscribeToAudio==YES)?@"unmute_sm":@"mute_sm";
@@ -970,7 +976,7 @@ OTSubscriber *maincontainerSubcriber=nil;
         [_allSubcribersPresentInRecyclerView setObject:subcriberViewInScroll forKey:sub.stream.connection.connectionId];
         
         
-        UIButton *subViewBtn=[self setAudioButtonsInRecyclerView:sub.view.frame.size.width-30 yAxis:sub.view.frame.size.height-30 width:30 height:30  tag:tag];
+        UIButton *subViewBtn=[self setAudioButtonsInRecyclerView:sub.view.frame.size.width-30 yAxis:sub.view.frame.size.height-30 width:30 height:30  tag:tag callingFrom:@"setViewsInScroll"];
         
         [sub.view addSubview:subViewBtn];
         [_allSubscribersButtons setObject:subViewBtn forKey:sub.stream.connection.connectionId];
@@ -1007,7 +1013,7 @@ UIImageView *mainContainerDefaultImg=nil;
     image.layer.masksToBounds=true;
     image.userInteractionEnabled=YES;
     [image addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapOnScrollerViews:)]];
-    UIButton *defaultImgBtn=[self setAudioButtonsInRecyclerView:image.frame.size.width-30 yAxis:image.frame.size.height-30 width:30 height:30  tag:tag];
+    UIButton *defaultImgBtn=[self setAudioButtonsInRecyclerView:image.frame.size.width-30 yAxis:image.frame.size.height-30 width:30 height:30  tag:tag callingFrom:@"addDefaultImage"];
     [image addSubview:defaultImgBtn];
     if([maincontainerSubcriber.stream.connection.connectionId isEqual:sub.stream.connection.connectionId]){
         defaultImgInitialInScrollTag=tag;
@@ -1216,13 +1222,14 @@ bool muteUnte=true;
     for (int i=0; i<_allSubscribers.count; i++) {
         OTSubscriber * participant=[_allSubscribers objectForKey:keys[i]];
         UIView *viewsInParticipants=[[UIView alloc] initWithFrame:CGRectMake(0,yAxis, _participantsListSheet.frame.size.width,60)];
-        UILabel *label=[self setLabel:0 yAxis:5 width:_participantsListSheet.frame.size.width hight:50 textColor:[UIColor lightGrayColor]];
+        NSLog(@"  %lu",participant.stream.name.length);
+        UILabel *label=[self setLabel:0 yAxis:5 width:(participant.stream.name.length+100) hight:50 textColor:[UIColor lightGrayColor]];
         label.text=[@"  " stringByAppendingString:participant.stream.name];
-        UIButton* particioantAudioBTN=[self setAudioButtonsInRecyclerView:(viewsInParticipants.frame.size.width-50) yAxis:10 width:40 height:40 tag:i];
+        UIButton* particioantAudioBTN=[self setAudioButtonsInRecyclerView:(viewsInParticipants.frame.size.width-50) yAxis:10 width:40 height:40 tag:i callingFrom:@"ParticipantsSheet"];
         viewsInParticipants.tag=i;
         viewsInParticipants.layer.borderWidth=0.5;
         viewsInParticipants.layer.borderColor=[[UIColor lightGrayColor] CGColor];
-        [label addSubview:particioantAudioBTN];
+        [viewsInParticipants addSubview:particioantAudioBTN];
         [viewsInParticipants addSubview:label];
         [_participantsListSheet addSubview:viewsInParticipants];
         yAxis=yAxis+60;
