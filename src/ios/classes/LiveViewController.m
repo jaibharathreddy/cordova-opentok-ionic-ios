@@ -98,6 +98,7 @@ Boolean changeveiw;
 bool tapped=YES;
 float initalXaxisOfSwapCame;
 UIPanGestureRecognizer * pan1 ;
+UIImageView *miniDefPublisher=nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     initalXaxisOfSwapCame=self.swapCameraButton.frame.origin.x;
@@ -143,6 +144,7 @@ UIPanGestureRecognizer * pan1 ;
     self.view.userInteractionEnabled = YES;
     [self.view addGestureRecognizer:tgr];
     [self overlayTimerSetUp];
+    miniDefPublisher=[self setUIImageviews:5 yAxis:3 width:20 hight:20 tintColor:[UIColor lightTextColor] imageName:@"defaultImgMini" setAlpha:1];
 }//view controller
 
 /*-----setSessionCountDownTime---*/
@@ -1313,8 +1315,7 @@ bool muteUnte=true;
     self.publisherDeaultImage.layer.borderWidth=1;
     self.publisherDeaultImage.layer.borderColor=[[UIColor orangeColor] CGColor];
     // self.publisherDeaultImage.backgroundColor=[UIColor blackColor];
-    UIImageView *miniDef=[self setUIImageviews:5 yAxis:3 width:20 hight:20 tintColor:[UIColor lightTextColor] imageName:@"defaultImgMini" setAlpha:0.5];
-    [self.publisherDeaultImage addSubview:miniDef];
+    [self.publisherDeaultImage addSubview:miniDefPublisher];
 }
 
 /*------connection created ---------*/
