@@ -944,7 +944,7 @@ OTSubscriber *maincontainerSubcriber=nil;
     }
     if(countOfSubAudio==_allSubscribers.count){
         [_muteAllBtnItem setImage:[UIImage imageNamed:@"ic_pause_audio"] forState:UIControlStateNormal];
-        [self.muteAllBtnItem setTitle:@"     Umute All" forState:UIControlStateNormal];
+        [self.muteAllBtnItem setTitle:@"     Unmute All" forState:UIControlStateNormal];
     }
 }
 
@@ -1016,7 +1016,7 @@ UIImageView *mainContainerDefaultImg=nil;
     image.layer.masksToBounds=true;
     image.userInteractionEnabled=YES;
     [image addGestureRecognizer: [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapOnScrollerViews:)]];
-    UIButton *defaultImgBtn=[self setAudioButtonsInRecyclerView:image.frame.size.width-30 yAxis:image.frame.size.height-30 width:30 height:30  tag:tag callingFrom:@"addDefaultImage"];
+    UIButton *defaultImgBtn=[self setAudioButtonsInRecyclerView:image.frame.size.width-27 yAxis:image.frame.size.height-27 width:27 height:27  tag:tag callingFrom:@"addDefaultImage"];
     [image addSubview:defaultImgBtn];
     if([maincontainerSubcriber.stream.connection.connectionId isEqual:sub.stream.connection.connectionId]){
         defaultImgInitialInScrollTag=tag;
@@ -1180,7 +1180,7 @@ NSTimer * notificationTiemr;
     if([_muteAllBtnItem.titleLabel.text isEqualToString:@"     Mute All"]){
         [self muteAllSubscriberAudio:NO];
         [_muteAllBtnItem setImage:[UIImage imageNamed:@"ic_pause_audio"] forState:UIControlStateNormal];
-        [_muteAllBtnItem setTitle:@"     Umute All" forState:UIControlStateNormal];
+        [_muteAllBtnItem setTitle:@"     Unmute All" forState:UIControlStateNormal];
     }else{
         [self muteAllSubscriberAudio:YES];
         [_muteAllBtnItem setImage:[UIImage imageNamed:@"unmute"] forState:UIControlStateNormal];
