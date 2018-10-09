@@ -815,7 +815,7 @@ int initialDefaultImgXaxis;
     [self removeViewsFromRecycler];
     [_changeViewButton setImage:[UIImage imageNamed:imgName] forState:UIControlStateNormal];
     if(!changeveiw){
-        int tag=([id isEqual:@"double"])? selectedTappedPersonIndex:0;//maincontainerSubcriber
+        int tag=([id isEqual:@"double"])? selectedTappedPersonIndex:(maincontainerSubcriber!=nil)? (int)self.mainContainerView.tag: 0;//maincontainerSubcriber
         OTSubscriber *sub=maincontainerSubcriber==nil?[_allSubscribers objectForKey:keys[tag]]:maincontainerSubcriber;
         [self setMainContainerSubscriberView:sub tag:tag];
     }
