@@ -25,6 +25,9 @@ OTPublisherDelegate,UIGestureRecognizerDelegate,UIScrollViewDelegate>
     OTSubscriber *_currentSubscriber;
     //BOOL isFullScreen;
 }
+@property (weak, nonatomic) IBOutlet UILabel *harizantalLabel;
+@property (weak, nonatomic) IBOutlet UILabel *verticalLabel;
+@property (weak, nonatomic) IBOutlet UILabel *topVerticalLabel;
 
 @property (weak, nonatomic) IBOutlet UIButton *audioBTNOne;
 @property (weak, nonatomic) IBOutlet UIButton *audioBTNTwo;
@@ -282,24 +285,27 @@ NSTimer *timer;
         self.timer.text= [NSString stringWithFormat:@"%02dH:%02dM:%02dS", hour, minut, sec];
     }else{
         [self destroyAll];
-        [timer invalidate];
-        timer = nil;
+        
     }
 }//updateCountdown
 /*------destroyAll-------*/
 -(void) destroyAll{
-    allowToSetScrollAxis=true;
-    [_session disconnect:nil];
-    [_allStreams removeAllObjects];
-    [keys removeAllObjects];
-    [_allSubscribersMesures removeAllObjects];
-    [_allSubcribersPresentInRecyclerView removeAllObjects];
-    [_allSubscribers removeAllObjects];
+    [timer invalidate];
+    timer = nil;
+    if (_session && _session.sessionConnectionStatus ==
+        OTSessionConnectionStatusConnected){
+        allowToSetScrollAxis=true;
+        [_session disconnect:nil];
+        [_allStreams removeAllObjects];
+        [keys removeAllObjects];
+        [_allSubscribersMesures removeAllObjects];
+        [_allSubcribersPresentInRecyclerView removeAllObjects];
+        [_allSubscribers removeAllObjects];
+        [self endBackgroundUpdateTask];
+        [UIApplication sharedApplication].idleTimerDisabled = NO;
+        return;
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
-    [self endBackgroundUpdateTask];
-    [UIApplication sharedApplication].idleTimerDisabled = NO;
-    [self cleanupPublisher];
-    return;
 }//destroyAll
 
 /*----cleanupPublisher----*/
@@ -695,6 +701,7 @@ bool appInBackGroundAudio;
     float heightOfView=height;
     
     for(int i=0;i<_allSubscribers.count;i++){
+        [self setLabelOfGrid:i];
         OTSubscriber * sub=[_allSubscribers objectForKey:keys[i]];
         if(sub.stream.hasVideo){
             [self addViewForGridView:sub width:widthOfView height:heightOfView xAxis:xAxisOfview yAxis:yAxisOfview tagValue:i];
@@ -707,6 +714,33 @@ bool appInBackGroundAudio;
         widthOfView=(_allSubscribers.count==3 && i==1)?_mainContainerView.frame.size.width :(_allSubscribers.count==2)?_mainContainerView.frame.size.width :width;
     }
 }//loopForGridViews
+
+-(void)setLabelOfGrid :(int )i{
+    if(i==0){
+        [_harizantalLabel setHidden:YES];
+        [_topVerticalLabel setHidden:YES];
+        [_verticalLabel setHidden:YES];
+    }
+    if(i==1){
+        [_verticalLabel setHidden:YES];
+        [_topVerticalLabel setHidden:YES];
+        [_harizantalLabel setHidden:NO];
+        _harizantalLabel.frame=CGRectMake(0, _mainContainerView.frame.size.height/2,_mainContainerView.frame.size.width,0.3);
+        
+    }
+    if(i==2){
+        [_verticalLabel setHidden:YES];
+        [_topVerticalLabel setHidden:NO];
+        _topVerticalLabel.frame=CGRectMake(_mainContainerView.frame.size.width/2, 0, 0.3,_mainContainerView.frame.size.height/2);
+    }
+    if(i==3){
+        [_topVerticalLabel setHidden:YES];
+        [_verticalLabel setHidden:NO];
+        _verticalLabel.frame=CGRectMake(_mainContainerView.frame.size.width/2, 0, 0.3,_mainContainerView.frame.size.height);
+    }
+    
+    
+}
 
 -(void)addDefaultImageForViewInGrid:(OTSubscriber *)sub width:(float )width height:(float )height xAxis:(float )xAxis yAxis:(float )yAxis tagValue:(int )tag{
     [self setSubscribersMesures:sub.stream.connection.connectionId xAxis:xAxis yAxis:yAxis width:width height:height tag:tag];
@@ -806,6 +840,7 @@ int initialDefaultImgXaxis;
 
 /*-----changeview----*/
 -(void) changeview:(NSString *)callingFrom{
+    [self setLabelOfGrid:0];
     if(changeveiw){
         [self commonForBothViews:NO imageViewName:@"gridView" id:callingFrom];
         [self.scrollView setHidden:NO];
@@ -1293,15 +1328,15 @@ bool muteUnte=true;
     [self.participantsListSheet addSubview:participantsHeaderView];
 }//setParticipantsHeader
 
-/*-(BOOL)shouldAutorotate{
- return NO;
- }
- -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
- return NO;
- }
- -(UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
- return UIInterfaceOrientationPortrait;
- }*/
+-(BOOL)shouldAutorotate{
+    return NO;
+}
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
+    return NO;
+}
+-(UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
+    return UIInterfaceOrientationPortrait;
+}
 
 /*dealloc--*/
 - (void)dealloc{
