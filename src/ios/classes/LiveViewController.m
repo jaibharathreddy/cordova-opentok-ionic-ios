@@ -1190,7 +1190,7 @@ NSTimer * notificationTiemr;
 }
 /*-------showTheParticipantsList------*/
 - (IBAction)showTheParticipantsList:(id)sender {
-    [self.messegeForUser setTextColor:[UIColor redColor]];
+    //[self.messegeForUser setTextColor:[UIColor redColor]];
     [self.participantsListSheet setHidden:NO];
     [self setParticipantsHeader];
     //  [self removeLabelsFromParticipantsSheet];
