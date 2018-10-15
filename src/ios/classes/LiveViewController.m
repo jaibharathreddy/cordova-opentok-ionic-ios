@@ -348,7 +348,6 @@ int publisherCounter=0;
 -(void)addPublisherview:(OTPublisher *)publisher{
     if(_allSubscribers.count>0){
         [self.publisherView setHidden:NO];
-        [publisher.view setFrame:CGRectMake(0, 0, self.publisherView.frame.size.width, self.publisherView.frame.size.height)];
         [self.publisherView addSubview:publisher.view];
         self.publisherView.layer.borderWidth=1;
         self.publisherView.layer.borderColor=[[UIColor orangeColor] CGColor];
@@ -436,7 +435,7 @@ bool appInBackGroundAudio;
         sub.subscribeToAudio=NO;
     }
     
-    if(_allSubscribers.count>4 && changeveiw){[self changeView:@"5"];}else{[self shuffle];}
+    if(_allSubscribers.count>4 && changeveiw){[self changeview:@"123"];}else{[self shuffle];}
 }//subscriberDidConnectToStream
 
 // Open Tok Delegates
@@ -486,7 +485,9 @@ bool appInBackGroundAudio;
 - (void)session:(OTSession *)session streamDestroyed:(OTStream *)stream{
     NSLog(@"streamDestroyed %@", stream.connection.connectionId);
     OTSubscriber *subscriber = [_allSubscribers objectForKey:stream.connection.connectionId];
-    maincontainerSubcriber=([maincontainerSubcriber.stream.connection.connectionId isEqual:subscriber.stream.connection.connectionId])?nil:maincontainerSubcriber;
+    if(maincontainerSubcriber!=nil){
+        maincontainerSubcriber=([maincontainerSubcriber.stream.connection.connectionId isEqual:subscriber.stream.connection.connectionId])?nil:maincontainerSubcriber;
+    }
     [keys removeObject:stream.connection.connectionId];
     [subscriber.view removeFromSuperview];
     [_allSubscribers removeObjectForKey:stream.connection.connectionId];
@@ -496,8 +497,9 @@ bool appInBackGroundAudio;
     [self notificationMessege:subscriberJoinedMSG];
     if(_allSubscribers.count<=1){
         [self.changeViewButton setHidden:YES];
+        maincontainerSubcriber=nil;
         changeveiw=false;
-        [self changeView:@"setToGridView"];
+        [self changeview:@"setToGridView"];
         if(_allSubscribers.count==0){
             [self stopNotification];
             [self addPublisherview:_publisher];
@@ -515,10 +517,11 @@ bool appInBackGroundAudio;
     }//if
 }//streamDestroyed
 
+
 /*------setRespectiveView----*/
 -(void)callRespectiveView{
     changeveiw=(changeveiw)?false:true;
-    [self changeView:@"123"];
+    [self changeview:@"123"];
 }//setRespectiveView
 
 /*---cleanupSubscriber--*/
@@ -743,9 +746,10 @@ int selectedTappedPersonIndex;
     selectedTappedPersonIndex=(int)pan.view.tag;
     if(_allSubscribers.count>1){
         changeveiw=true;
-        [self changeView:@"double"];
+        [self changeview:@"double"];
     }
 }//tapTwiceOnAnyTraineeInGridView
+
 
 -(void)setSubscribersMesures:(NSString* )connectionId xAxis:(double )xAxis yAxis:(double )yAxis width:(double )width height:(double )height tag:(int )tag
 {
@@ -793,22 +797,25 @@ int selectedTappedPersonIndex;
     NSLog(@"subscriber could not connect to stream");
 }
 
-
 int initialDefaultImgXaxis;
 /*----changeView----*/
-- (IBAction)changeView:(id)sender {
+- (IBAction)changeViewBtn:(id)sender {
+    maincontainerSubcriber=nil;
+    [self changeview:@"main"];
+}//changeView
+
+/*-----changeview----*/
+-(void) changeview:(NSString *)callingFrom{
     if(changeveiw){
-        [self commonForBothViews:NO imageViewName:@"gridView" id:sender];
+        [self commonForBothViews:NO imageViewName:@"gridView" id:callingFrom];
         [self.scrollView setHidden:NO];
         [self setupScrollView];
         initialDefaultImgXaxis=102;
-        [self setUpPublisherFrame:_scrollView.frame.origin.y height:_scrollView.frame.size.height width:80];
     }else{
         [self.scrollView setHidden:YES];
-        [self setUpPublisherFrame:self.mainContainerView.frame.size.height-180 height:80 width:80];
-        [self commonForBothViews:YES imageViewName:@"galaryView" id:sender];
+        [self commonForBothViews:YES imageViewName:@"galaryView" id:callingFrom];
     }
-}//changeView
+}//changeview
 
 -(void)commonForBothViews:(Boolean )booleanValue imageViewName:(NSString *)imgName id:(NSString *)id{
     changeveiw=booleanValue;
@@ -817,12 +824,16 @@ int initialDefaultImgXaxis;
     [self removeViewsFromRecycler];
     [_changeViewButton setImage:[UIImage imageNamed:imgName] forState:UIControlStateNormal];
     if(!changeveiw){
-        int tag=([id isEqual:@"double"])? selectedTappedPersonIndex:(maincontainerSubcriber!=nil)? (int)self.mainContainerView.tag: 0;//maincontainerSubcriber
+        NSLog(@"selecteindex %d maincon %d",selectedTappedPersonIndex,(int)self.mainContainerView.tag);
+        int tag=([id isEqualToString:@"double"])? selectedTappedPersonIndex:([id isEqualToString:@"123"])? (int)self.mainContainerView.tag: 0;//maincontainerSubcriber
         OTSubscriber *sub=maincontainerSubcriber==nil?[_allSubscribers objectForKey:keys[tag]]:maincontainerSubcriber;
         [self setMainContainerSubscriberView:sub tag:tag];
+        [self shuffle];
+    }else{
+        [self shuffle];
     }
-    [self shuffle];
 }
+
 NSMutableArray* btnArrayKey;
 -(void)removeAllSubscribersButtonsFromView{
     for(int i=0;i<=keys.count;i++){
@@ -897,6 +908,7 @@ OTSubscriber *maincontainerSubcriber=nil;
 -(UIButton *) setAudioButtonsInRecyclerView:(double )xAxis yAxis:(double )yAxis width:(double )width height:(double )height tag:(int )tagNo callingFrom:(NSString *)callingFrom {
     UIButton *button=nil;
     OTSubscriber *subAudio=[_allSubscribers objectForKey:keys[tagNo]];
+    
     if([callingFrom isEqualToString:@"ParticipantsSheet"]){
         button=[[UIButton alloc] init];
     }else{
@@ -912,6 +924,8 @@ OTSubscriber *maincontainerSubcriber=nil;
     [button setBackgroundColor:[UIColor whiteColor]];
     button.tag=tagNo;
     [button addTarget:self action:@selector(setSubscriberAudio:) forControlEvents:UIControlEventTouchDown];
+    button.layer.cornerRadius=3;
+    [button setClipsToBounds:YES];
     return button;
 }
 
@@ -922,15 +936,21 @@ OTSubscriber *maincontainerSubcriber=nil;
     UIButton * clickeBTN=sender;
     if(subAudio.subscribeToAudio==YES){
         subAudio.subscribeToAudio=NO;
-        [clickeBTN setImage:[[UIImage imageNamed:@"mute_sm"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        [clickeBTN setTintColor:[UIColor redColor]];
-        [self checkAllSubscriberAudioAndSetMuteAllBtnTitle];
+        if(subAudio.subscribeToAudio==NO){
+            [clickeBTN setImage:[[UIImage imageNamed:@"mute_sm"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+            [clickeBTN setTintColor:[UIColor redColor]];
+            [self checkAllSubscriberAudioAndSetMuteAllBtnTitle];
+        }
     }else{
-        subAudio.subscribeToAudio=YES;
-        [_muteAllBtnItem setImage:[UIImage imageNamed:@"unmute"] forState:UIControlStateNormal];
-        [self.muteAllBtnItem setTitle:@"     Mute All" forState:UIControlStateNormal];
-        [clickeBTN setImage:[[UIImage imageNamed:@"unmute_sm"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        [clickeBTN setTintColor:[UIColor greenColor]];
+        subAudio.subscribeToAudio=YES;// if user don't have audio we can't subscribe
+        if(subAudio.subscribeToAudio==YES){
+            [_muteAllBtnItem setImage:[UIImage imageNamed:@"unmute"] forState:UIControlStateNormal];
+            [self.muteAllBtnItem setTitle:@"     Mute All" forState:UIControlStateNormal];
+            [clickeBTN setImage:[[UIImage imageNamed:@" "] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+            [clickeBTN setTintColor:[UIColor greenColor]];
+        } else{
+            [self notificationMessege:[[@"Issue with " stringByAppendingString:subAudio.stream.name] stringByAppendingString:@" audio"]];
+        }//checking audio subscribe or not
         
     }
 }
@@ -945,6 +965,9 @@ OTSubscriber *maincontainerSubcriber=nil;
     if(countOfSubAudio==_allSubscribers.count){
         [_muteAllBtnItem setImage:[UIImage imageNamed:@"ic_pause_audio"] forState:UIControlStateNormal];
         [self.muteAllBtnItem setTitle:@"     Unmute All" forState:UIControlStateNormal];
+    }else{
+        [self.muteAllBtnItem setTitle:@"     Mute All" forState:UIControlStateNormal];
+        [_muteAllBtnItem setImage:[UIImage imageNamed:@"unmute"] forState:UIControlStateNormal];
     }
 }
 
@@ -1167,11 +1190,13 @@ NSTimer * notificationTiemr;
 }
 /*-------showTheParticipantsList------*/
 - (IBAction)showTheParticipantsList:(id)sender {
+    [self.messegeForUser setTextColor:[UIColor redColor]];
     [self.participantsListSheet setHidden:NO];
     [self setParticipantsHeader];
     //  [self removeLabelsFromParticipantsSheet];
     [self setSubscribersButtonsInParticipantsSheet];
 }
+
 
 
 
@@ -1183,11 +1208,8 @@ NSTimer * notificationTiemr;
         [_muteAllBtnItem setTitle:@"     Unmute All" forState:UIControlStateNormal];
     }else{
         [self muteAllSubscriberAudio:YES];
-        [_muteAllBtnItem setImage:[UIImage imageNamed:@"unmute"] forState:UIControlStateNormal];
-        [_muteAllBtnItem setTitle:@"     Mute All" forState:UIControlStateNormal];
-        
+        [self checkAllSubscriberAudioAndSetMuteAllBtnTitle];
     }
-    //[self.muteAllActionSheet setHidden:YES];
     muteUnte=true;
 }//muteAll
 
@@ -1206,6 +1228,7 @@ bool muteUnte=true;
 /*--------menuBTN-------*/
 - (IBAction)menuBTN:(id)sender {
     if(muteUnte){
+        [self checkAllSubscriberAudioAndSetMuteAllBtnTitle];
         [self.muteAllActionSheet setHidden:NO];
         muteUnte=false;
     }else{
@@ -1312,9 +1335,9 @@ bool muteUnte=true;
 /*----setPublisherDefaultImage----*/
 -(void)setPublisherDefaultImageViewIcon{
     [self.publisherDeaultImage setHidden:NO];
+    [self.publisherDeaultImage setFrame:CGRectMake(_publisherView.frame.origin.x, _publisherView.frame.origin.y, _publisherView.frame.size.width, _publisherView.frame.size.height)];
     self.publisherDeaultImage.layer.borderWidth=1;
     self.publisherDeaultImage.layer.borderColor=[[UIColor orangeColor] CGColor];
-    // self.publisherDeaultImage.backgroundColor=[UIColor blackColor];
     [self.publisherDeaultImage addSubview:miniDefPublisher];
 }
 
