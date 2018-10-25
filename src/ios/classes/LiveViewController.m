@@ -354,6 +354,7 @@ int publisherCounter=0;
 -(void)addPublisherview:(OTPublisher *)publisher{
     if(_allSubscribers.count>0){
         [self.publisherView setHidden:NO];
+         [_publisher.view setFrame:CGRectMake(0, 0,self.publisherView.frame.size.width,self.publisherView.frame.size.height)];
         [self.publisherView addSubview:publisher.view];
         self.publisherView.layer.borderWidth=1;
         self.publisherView.layer.borderColor=[[UIColor orangeColor] CGColor];
